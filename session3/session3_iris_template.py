@@ -16,24 +16,39 @@ flower1 = {
 
 # Task 1: Create A dictionary for second flower
 
-# flower2 = {
-# "id": "flower2",
-# <your code here>: 4.9,
-# <your code here> add key value
-# "species": "setosa"
-# <your code here> remember to close me for a dict
+flower2 = {
+"id": "flower2",
+"sepal_length": 4.9,
+"sepal_width": 3.0,
+"petal_length": 1.4,
+"petal_width": 0.2,
+"species": "setosa"
+} #remember to close me for a dict
 
 
 # Task 2: Create list of dictionaries
-# dataset= <your code here>
-
+dataset= [flower1, flower2]
+threshold = 2.0             # Common threshold for Iris Setosa petal length
+positive_label = "setosa"
+negative_label = "not setosa"
 
 # Task 3: Create a for loop to process the dataset
-# for <your code here> in dataset:
-#     print(<your code here>["id"], <your code here>["petal_length"], <your code here>["species"])
+for sample in dataset:
+    print(sample["id"], sample["petal_length"], sample["species"])
+    y_true = sample["species"]
 
 # Task 4: Use an if-else statement to classify each sample
-# if <your code here>["petal_length"] < threshold:
-#     y_pred = positive_label
-# <your code here>
-#     <your code here> = negative_label
+if sample["petal_length"] < threshold:
+        y_pred = positive_label
+else:
+        y_pred = negative_label
+
+    # 3. Update scores (must stay indented inside the loop)
+total += 1
+if y_pred == y_true:
+        correct += 1
+        print(
+    f"id={sample['id']} | true={y_true} | pred={y_pred} |"
+    f"petal_length={sample['petal_length']}"
+)
+        accuracy= (correct / total) * 100 if total > 0 else 0.0
