@@ -34,21 +34,37 @@ negative_label = "not setosa"
 
 # Task 3: Create a for loop to process the dataset
 for sample in dataset:
-    print(sample["id"], sample["petal_length"], sample["species"])
+    # 1. Identify true label
     y_true = sample["species"]
 
-# Task 4: Use an if-else statement to classify each sample
-if sample["petal_length"] < threshold:
+    # 2. Classification logic
+    if sample["petal_length"] < threshold:
         y_pred = positive_label
-else:
+    else:
         y_pred = negative_label
 
-    # 3. Update scores (must stay indented inside the loop)
-total += 1
-if y_pred == y_true:
+    # 3. Update Metrics (CRITICAL)
+    total += 1
+    if y_pred == y_true:
         correct += 1
-        print(
-    f"id={sample['id']} | true={y_true} | pred={y_pred} |"
-    f"petal_length={sample['petal_length']}"
-)
-        accuracy= (correct / total) * 100 if total > 0 else 0.0
+    else:
+        wrong += 1
+    
+    # 4. Append prediction to the list
+    y_pred_list.append(y_pred)
+
+    # Task 4: Print Per-Sample Trace Line (Exact format from manual)
+    print(
+        f"id={sample['id']} | true={y_true} | pred={y_pred} | "
+        f"petal_length={sample['petal_length']}"
+    )
+
+# --- THE SUMMARY (Task 5 - After the loop) ---
+accuracy = (correct / total) * 100 if total > 0 else 0.0
+
+print("-" * 30) # Visual separator
+print(f"Correct: {correct}")
+print(f"Wrong: {wrong}")
+print(f"Total: {total}")
+print(f"Accuracy (%): {accuracy}")
+print(f"All predictions: {y_pred_list}")
