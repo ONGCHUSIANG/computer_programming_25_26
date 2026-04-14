@@ -56,7 +56,7 @@ def derive_true_label(sample):
 
 
 # Task 2: Rename setup_application to run_classifier_pipeline
-def setup_classifier_pipeline(threshold=2.0, print_each=True):
+def run_classifier_pipeline(threshold=2.0, print_each=True):
     """Run the full classifier pipeline and compute accuracy."""
     dataset = setup_application_list()
     correct, wrong, total, y_pred_list = run_prediction_loop(
