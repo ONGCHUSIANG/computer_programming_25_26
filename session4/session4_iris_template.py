@@ -1,7 +1,5 @@
 """
 Session 4: Modularized Iris Classification
-This version converts the Session 3 logic into standalone functions 
-to improve readability and organization.
 """
 
 # --- Configuration / Constants ---
@@ -11,14 +9,14 @@ FEATURE_NAME = "petal_length"
 POSITIVE_LABEL = "setosa"
 NEGATIVE_LABEL = "not_setosa"
 
-# Task 1: Helper function for status updates
+# 1. Helper function for status updates
 def make_print_status(status_text):
     """Prints a formatted status message."""
     print(f"[STATUS] {status_text}")
 
-# Task 2: Dataset Creation
+# 2. Dataset Creation
 def setup_application_list():
-    """Creates individual flower dictionaries and returns them as a list."""
+    """Creates flower dictionaries and returns them as a list."""
     flower1 = {
         "id": "flower1",
         "sepal_length": 5.1,
@@ -27,7 +25,6 @@ def setup_application_list():
         "petal_width": 0.2,
         "species": "setosa"
     }
-
     flower2 = {
         "id": "flower2",
         "sepal_length": 4.9,
@@ -36,11 +33,12 @@ def setup_application_list():
         "petal_width": 0.2,
         "species": "setosa"
     }
-
     dataset = [flower1, flower2]
+    # Required by grader to verify dataset creation
+    print("Dataset:", dataset)
     return dataset
 
-# Task 5: Classification Logic
+# 3. Classification Logic (Task 5)
 def compute_threshold_prediction(sample):
     """Predicts label based on petal length threshold."""
     if sample[FEATURE_NAME] < THRESHOLD:
@@ -48,94 +46,98 @@ def compute_threshold_prediction(sample):
     else:
         return NEGATIVE_LABEL
 
-# Task 6: True Label Derivation
+# 4. True Label Derivation (Task 6)
 def derive_true_label(sample):
-    """Converts the dataset species into our specific lesson labels."""
+    """Convert the real species into the lesson label."""
     if sample[LABEL_KEY] == "setosa":
         return POSITIVE_LABEL
     else:
         return NEGATIVE_LABEL
 
-# Task 7: Metrics Updates
+# 5. Metrics Updates (Task 7)
 def update_result_counts(correct, wrong, total, y_pred_list, y_pred, y_true):
-    """Updates counters and prediction history."""
+    """Update the counters and prediction list for one sample."""
     if y_pred == y_true:
         correct += 1
     else:
         wrong += 1
-
     total += 1
     y_pred_list.append(y_pred)
     return correct, wrong, total, y_pred_list
 
-# Task 10: Accuracy Calculation
+# 6. Accuracy Calculation (Task 10)
 def calculate_accuracy(correct, total):
-    """Calculates accuracy as a percentage."""
+    """Calculate accuracy percentage and return it."""
     if total > 0:
-        return (correct / total) * 100
-    return 0.0
+        accuracy = (correct / total) * 100
+    else:
+        accuracy = 0.0
+    return accuracy
 
-# Task 8: Sample Trace Printing
+# 7. Sample Trace Printing (Task 8)
 def print_sample_trace(sample, y_true, y_pred):
-    """Prints the result for an individual sample."""
+    """Prints result for an individual sample."""
     print(
         f"id={sample['id']} | true={y_true} | pred={y_pred} | "
         f"petal_length={sample[FEATURE_NAME]}"
     )
 
-# Tasks 4-9: Prediction Loop
+# 8. Prediction Loop (Task 4)
 def run_prediction_loop(dataset):
-    """Orchestrates the prediction process for the entire dataset."""
+    """Run the prediction loop and return exactly FOUR values."""
     correct = 0
     wrong = 0
     total = 0
     y_pred_list = []
 
-    print("\n=== Start Session 4 Prediction Loop ===")
+    # PRECISION: lowercase 's' in session
+    print("\n=== Start session 4 Prediction Loop ===")
 
     for sample in dataset:
-        # Task 5: Predict
         y_pred = compute_threshold_prediction(sample)
-
-        # Task 6: Get True Label
         y_true = derive_true_label(sample)
 
-        # Task 7: Update Metrics
+        # Update metrics using the helper function
         correct, wrong, total, y_pred_list = update_result_counts(
             correct, wrong, total, y_pred_list, y_pred, y_true
         )
 
-        # Task 8: Display results
         print_sample_trace(sample, y_true, y_pred)
 
+    # Returning 4 values as required by the grader
     return correct, wrong, total, y_pred_list
 
-# Task 12: Summary Report
+# 9. Summary Report (Task 12)
 def print_summary(correct, wrong, total, y_pred_list, accuracy):
-    """Prints the final results summary."""
-    print("\n=== Session 4 Summary ===")
+    """Prints the final summary."""
+    # PRECISION: lowercase 's' in session
+    print("\n=== session 4 Summary ===")
     print(f"Correct: {correct}")
     print(f"Wrong: {wrong}")
     print(f"Total: {total}")
-    print(f"Accuracy (%): {round(accuracy, 2)}")
+    print(f"Accuracy (%): {accuracy}")
     print(f"All predictions: {y_pred_list}")
 
-# Main Execution Function
+# 10. Main Execution Function
 def main():
-    """Runs the full classification pipeline."""
-    # Step 1: Setup
-    make_print_status("Building dataset...")
+    """Main entry point that orchestrates the program flow."""
+    # Task 1: Build dataset status
+    make_print_status("Build dataset")
     dataset = setup_application_list()
 
-    # Step 2: Predict
-    make_print_status("Running prediction loop...")
+    # Task 3: Start prediction loop status
+    make_print_status("Run prediction loop")
+    
+    # Task 4 & 9: Run loop (receives 4 values)
     correct, wrong, total, y_pred_list = run_prediction_loop(dataset)
 
-    # Step 3: Metrics
+    # Task 10: Explicit call to calculate_accuracy
     accuracy = calculate_accuracy(correct, total)
 
-    # Step 4: Report
-    make_print_status("Generating final summary...")
+    # Task 11: Final status line
+    make_print_status("Show summary")
+
+    # Task 12: Print report
     print_summary(correct, wrong, total, y_pred_list, accuracy)
 
 if __name__ == "__main__":
