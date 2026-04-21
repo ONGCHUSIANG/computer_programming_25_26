@@ -64,10 +64,10 @@ class ClassifierBase:
         Returns:
             str: self.positive_label if species matches, else self.negative_label.
         """
-        # If sample["species"] == self.positive_label:
-        #     return self.positive_label
-        # Otherwise return self.negative_label
-        pass
+        if sample["species"] == self.positive_label:
+            return self.positive_label
+        else:
+            return self.negative_label
 
     # Task 2: Implement update_result_counts
     def update_result_counts(self, correct, wrong, total, y_pred_list, y_pred, y_true):
@@ -92,7 +92,13 @@ class ClassifierBase:
         # 3. Always increase total by 1 (even when the prediction is wrong!)
         # 4. Append y_pred to y_pred_list
         # 5. Return the tuple: (correct, wrong, total, y_pred_list)
-        pass
+        if y_pred == y_true:
+            correct +=1
+        else:
+            wrong +=1
+        total +=1
+        y_pred_list.append(y_pred)
+        return correct, wrong, total, y_pred_list
 
     # Task 3: Implement calculate_accuracy
     def calculate_accuracy(self, correct, total):
@@ -106,10 +112,10 @@ class ClassifierBase:
             float: Accuracy percentage between 0.0 and 100.0.
                    Returns 0.0 if total is zero (protection against division by zero).
         """
-        # If total > 0:
-        #     return (correct / total) * 100
-        # Otherwise return 0.0
-        pass
+        if total > 0:
+            return (correct / total) * 100
+        else:
+            return 0.0
 
     # Task 4: Implement evaluate
     def evaluate(self, dataset):
@@ -128,27 +134,26 @@ class ClassifierBase:
         Returns:
             tuple: (correct, wrong, total, y_pred_list, accuracy)
         """
-        # correct = 0
-        # wrong = 0
-        # total = 0
-        # y_pred_list = []
+        correct = 0
+        wrong = 0
+        total = 0
+        y_pred_list = []
 
-        # print("\n=== Start Evaluation ===")
+        print("\n=== Start Evaluation ===")
 
-        # for sample in dataset:
-        #     y_pred = self.predict(<your code here>)
-        #     y_true = self.derive_true_label(<your code here>)
-        #     correct, wrong, total, y_pred_list = self.update_result_counts(
-        #         correct, wrong, total, y_pred_list, y_pred, y_true
-        #     )
-        #     print(
-        #         f"id={sample['id']} | true={y_true} | pred={y_pred} | "
-        #         f"petal_length={sample['petal_length']}"
-        #     )
+        for sample in dataset:
+            y_pred = self.predict(sample)
+            y_true = self.derive_true_label(sample)
+            correct, wrong, total, y_pred_list = self.update_result_counts(
+                correct, wrong, total, y_pred_list, y_pred, y_true
+            )
+            print(
+                f"id={sample['id']} | true={y_true} | pred={y_pred} | "
+                f"petal_length={sample['petal_length']}"
+            )
 
-        # accuracy = self.calculate_accuracy(correct, total)
-        # return correct, wrong, total, y_pred_list, accuracy
-        pass
+        accuracy = self.calculate_accuracy(correct, total)
+        return correct, wrong, total, y_pred_list, accuracy
 
 
 class RuleClassifier(ClassifierBase):
@@ -171,7 +176,8 @@ class RuleClassifier(ClassifierBase):
         """
         # 1. Call super().__init__() to run the parent's setup
         # 2. Store the threshold: self.threshold = threshold
-        pass
+        super().__init__()
+        self.threshold = threshold
 
     # Task 6: Implement RuleClassifier.predict
     def predict(self, sample):
@@ -186,10 +192,10 @@ class RuleClassifier(ClassifierBase):
         Returns:
             str: self.positive_label or self.negative_label.
         """
-        # If sample["petal_length"] < self.threshold:
-        #     return self.positive_label
-        # Otherwise return self.negative_label
-        pass
+        if sample["petal_length"] < self.threshold:
+            return self.positive_label
+        else:
+            return self.negative_label
 
 
 class NearestCentroidClassifier(ClassifierBase):
@@ -214,7 +220,11 @@ class NearestCentroidClassifier(ClassifierBase):
         # 1. Call super().__init__() to run the parent's setup
         # 2. Store setosa_center: self.setosa_center = setosa_center
         # 3. Store not_setosa_center: self.not_setosa_center = not_setosa_center
-        pass
+        super().__init__()
+        self.setosa_center = setosa_center
+        self.not_setosa_center = not_setosa_center
+    
+
 
     # Task 8: Implement NearestCentroidClassifier.predict
     def predict(self, sample):
@@ -237,7 +247,13 @@ class NearestCentroidClassifier(ClassifierBase):
         # 3. dist_to_not_setosa = abs(petal_length - self.not_setosa_center)
         # 4. If dist_to_setosa < dist_to_not_setosa: return self.positive_label
         # 5. Otherwise: return self.negative_label
-        pass
+        petal_length = sample["petal_length"]
+        dist_to_setosa = abs(petal_length - self.setosa_center)
+        dist_to_not_setosa = abs(petal_length - self.not_setosa_center)
+        if dist_to_setosa < dist_to_not_setosa:
+            return self.positive_label
+        else:
+            return self.negative_label
 
 
 # Task 9: Implement run_and_report
@@ -261,8 +277,10 @@ def run_and_report(classifier, dataset, name):
     # 3. Print the summary:
     #    print(f"Correct: {correct}  Wrong: {wrong}  Total: {total}")
     #    print(f"Accuracy (%): {round(accuracy, 2)}")
-    pass
-
+    print(f"\n--- {name} ---")
+    correct,wrong,total,y_pred_list,accuracy = classifier.evaluate(dataset)
+    print(f"Correct: {correct}  Wrong: {wrong}  Total: {total}")
+    print(f"Accuracy (%): {round(accuracy, 2)}")
 
 def main():
     # Task 10: Compare Classifiers in main()
@@ -271,21 +289,22 @@ def main():
     dataset = setup_application_list()
 
     # Step 2: Create a RuleClassifier and a NearestCentroidClassifier
-    # rule_clf = RuleClassifier(<your code here>)
-    # centroid_clf = NearestCentroidClassifier(<your code here>)
+    rule_clf = RuleClassifier(threshold=2.0)
+    centroid_clf = NearestCentroidClassifier(setosa_center=1.5, not_setosa_center=4.5)
 
     # Step 3: Call run_and_report for each classifier
-    # run_and_report(rule_clf, dataset, "RuleClassifier")
-    # run_and_report(centroid_clf, dataset, "NearestCentroidClassifier")
+    print("\n--- Manual Calls ---")
+    run_and_report(rule_clf, dataset, "RuleClassifier")
+    run_and_report(centroid_clf, dataset, "NearestCentroidClassifier")
 
     # Step 4: Demonstrate polymorphism using a loop over a list of classifiers
-    # classifiers = [
-    #     RuleClassifier(<your code here>),
-    #     NearestCentroidClassifier(<your code here>),
-    # ]
-    # for clf in classifiers:
-    #     run_and_report(clf, dataset, clf.__class__.__name__)
-    pass
+    print("\n--- Polymorphism Loop ---")
+    classifiers = [
+        RuleClassifier(threshold=2.0),
+        NearestCentroidClassifier(setosa_center=1.5, not_setosa_center=4.5),
+    ]
+    for clf in classifiers:
+        run_and_report(clf, dataset, clf.__class__.__name__)
 
 
 if __name__ == "__main__":
